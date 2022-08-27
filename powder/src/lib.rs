@@ -22,7 +22,7 @@ where
 {
     pub fn new(state: T) -> Result<Self, String> {
         let event_loop = EventLoop::new();
-        let window_builder = WindowBuilder::new().with_title("Jimmy");
+        let window_builder = WindowBuilder::new().with_title("Powder");
 
         // Build window context
         let context = ContextBuilder::new()
