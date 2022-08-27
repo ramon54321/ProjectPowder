@@ -11,3 +11,11 @@ cd powder
 cargo run --example hello_world
 ```
 
+You will also need to depend on `femtovg` and `nalgebra-glm`.
+
+```toml
+[dependencies]
+femtovg = "0.3.5"
+nalgebra-glm = "0.17.0"
+```
+
