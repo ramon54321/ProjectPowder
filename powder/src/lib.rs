@@ -1,26 +1,33 @@
 use femtovg::{renderer::OpenGl, Canvas, Color};
 use glutin::{
-    event::{Event, WindowEvent},
+    event::{ElementState, Event, MouseButton, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder},
     ContextBuilder, ContextWrapper, PossiblyCurrent,
 };
+use nalgebra_glm::Vec2;
 
-pub type RenderLayerFn = Box<dyn FnMut(&mut Canvas<OpenGl>) -> ()>;
+pub type RenderLayerFn<T> = Box<dyn FnMut(&mut Canvas<OpenGl>, &mut Meta, &mut T) -> ()>;
 
-pub struct Powder {
+pub struct Powder<T> {
+    state: T,
     event_loop: EventLoop<()>,
     context: ContextWrapper<PossiblyCurrent, Window>,
     canvas: Canvas<OpenGl>,
-    render_layers: Vec<RenderLayerFn>,
+    render_layers: Vec<RenderLayerFn<T>>,
 }
-impl Powder {
-    pub fn new() -> Result<Self, String> {
+impl<T> Powder<T>
+where
+    T: 'static,
+{
+    pub fn new(state: T) -> Result<Self, String> {
         let event_loop = EventLoop::new();
         let window_builder = WindowBuilder::new().with_title("Jimmy");
 
         // Build window context
-        let context = ContextBuilder::new().build_windowed(window_builder, &event_loop);
+        let context = ContextBuilder::new()
+            .with_multisampling(8)
+            .build_windowed(window_builder, &event_loop);
         if context.is_err() {
             return Err("Could not build window".to_string());
         }
@@ -49,6 +56,7 @@ impl Powder {
         let canvas = canvas.unwrap();
 
         Ok(Self {
+            state,
             event_loop,
             context,
             canvas,
@@ -56,6 +64,9 @@ impl Powder {
         })
     }
     pub fn start(mut self) {
+        let mut mouse_position = Vec2::new(0.0, 0.0);
+        let mut is_mouse_down = false;
+
         self.event_loop.run(move |event, _, control_flow| {
             *control_flow = ControlFlow::Poll;
 
@@ -65,6 +76,33 @@ impl Powder {
                 Event::LoopDestroyed => return,
                 Event::WindowEvent { ref event, .. } => match event {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                    WindowEvent::CursorMoved {
+                        device_id: _,
+                        position,
+                        ..
+                    } => {
+                        mouse_position.x = position.x as f32;
+                        mouse_position.y = position.y as f32;
+                    }
+                    WindowEvent::MouseInput {
+                        device_id: _,
+                        state,
+                        button,
+                        ..
+                    } => match state {
+                        ElementState::Pressed => match button {
+                            MouseButton::Left => {
+                                is_mouse_down = true;
+                            }
+                            _ => (),
+                        },
+                        ElementState::Released => match button {
+                            MouseButton::Left => {
+                                is_mouse_down = false;
+                            }
+                            _ => (),
+                        },
+                    },
                     _ => (),
                 },
                 Event::RedrawRequested(_) => {
@@ -80,9 +118,15 @@ impl Powder {
                         Color::rgbf(0.0, 0.0, 0.0),
                     );
 
+                    // Construct state for current frame
+                    let mut meta = Meta {
+                        mouse_position,
+                        is_mouse_down,
+                    };
+
                     // Rendering
                     for render_layer in self.render_layers.iter_mut() {
-                        (render_layer)(&mut self.canvas);
+                        (render_layer)(&mut self.canvas, &mut meta, &mut self.state);
                     }
 
                     // After Rendering
@@ -94,7 +138,12 @@ impl Powder {
             };
         });
     }
-    pub fn push(&mut self, render_layer: RenderLayerFn) {
+    pub fn push(&mut self, render_layer: RenderLayerFn<T>) {
         self.render_layers.push(render_layer);
     }
+}
+
+pub struct Meta {
+    pub mouse_position: Vec2,
+    pub is_mouse_down: bool,
 }
