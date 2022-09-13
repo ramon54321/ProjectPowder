@@ -1,3 +1,7 @@
+<div align="center">
+  <span><img src="./docs/powder_logo.svg" width="50%"></span>
+</div>
+
 ### Powder
 
 Lightweight wrapper over [Femtovg](https://github.com/femtovg/femtovg) and [Glutin](https://github.com/rust-windowing/glutin) with an immediate style drawing API.
