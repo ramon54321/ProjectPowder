@@ -13,7 +13,7 @@ fn main() {
     };
 
     // Init Powder
-    let powder = Powder::new(state);
+    let powder = Powder::new(state, 800, 600);
     if powder.is_err() {
         eprintln!("Powder error: {}", powder.err().unwrap());
         return;

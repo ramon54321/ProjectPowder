@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use femtovg::{renderer::OpenGl, Canvas, Color, FontId};
 use glutin::{
+    dpi::LogicalSize,
     event::{ElementState, Event, MouseButton, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder},
@@ -22,9 +23,11 @@ impl<T> Powder<T>
 where
     T: 'static,
 {
-    pub fn new(state: T) -> Result<Self, String> {
+    pub fn new(state: T, width: u16, height: u16) -> Result<Self, String> {
         let event_loop = EventLoop::new();
-        let window_builder = WindowBuilder::new().with_title("Powder");
+        let window_builder = WindowBuilder::new()
+            .with_min_inner_size(LogicalSize::new(width, height))
+            .with_title("Powder");
 
         // Build window context
         let context = ContextBuilder::new()
