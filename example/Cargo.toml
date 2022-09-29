@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 powder = { path = "../powder" }
 femtovg = "0.3.5"
+nalgebra-glm = "0.17.0"

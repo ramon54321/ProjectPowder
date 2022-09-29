@@ -8,7 +8,14 @@ Lightweight wrapper over [Femtovg](https://github.com/femtovg/femtovg) and [Glut
 
 ### Getting Started
 
-The examples can be run as follows.
+The root example directory contains a scaffold application showing how powder can be used with a logical simulation thread running separately alongside the render thread.
+
+Start a new project with.
+```bash
+cp -r example ../my_project
+```
+
+The individual examples can be run as follows.
 
 ```rust
 cd powder
