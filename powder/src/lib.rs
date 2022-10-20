@@ -8,7 +8,7 @@ use glutin::{
     dpi::{LogicalSize, PhysicalPosition},
     event::{ElementState, Event, MouseButton, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    window::{Window, WindowAttributes, WindowBuilder},
+    window::{Window, WindowBuilder},
     ContextBuilder, ContextWrapper, PossiblyCurrent,
 };
 use nalgebra_glm::Vec2;
